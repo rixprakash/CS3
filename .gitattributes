@@ -12,3 +12,4 @@ DATA/DeepGuardDB_v1/SD_dataset/real/* filter=lfs diff=lfs merge=lfs -text
 DATA/DeepGuardDB_v1/**/* filter=lfs diff=lfs merge=lfs -text
 *.jpg filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
+*.npy filter=lfs diff=lfs merge=lfs -text
