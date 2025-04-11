@@ -1,0 +1,27 @@
+# Dataset files
+DATA/images/
+*.jpg
+*.jpeg
+*.png
+# Exception for DeepGuardDB_v1
+!DATA/DeepGuardDB_v1/**/*.jpg
+!DATA/DeepGuardDB_v1/**/*.jpeg
+!DATA/DeepGuardDB_v1/**/*.png
+
+# System files
+.DS_Store
+__pycache__/
+*.pyc
+
+# Model checkpoints
+*.h5
+best_model.h5
+
+# IDE files
+.vscode/
+.idea/
+
+# Environment
+venv/
+env/
+*.env 

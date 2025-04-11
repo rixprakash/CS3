@@ -1,0 +1,12 @@
+DATA/DeepGuardDB_v1/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+DATA/DeepGuardDB_v1/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+DATA/DeepGuardDB_v1/**/*.png filter=lfs diff=lfs merge=lfs -text
+DATA/DeepGuardDB_v1/DALLE_dataset/fake/* filter=lfs diff=lfs merge=lfs -text
+DATA/DeepGuardDB_v1/DALLE_dataset/real/* filter=lfs diff=lfs merge=lfs -text
+DATA/DeepGuardDB_v1/GLIDE_dataset/fake/* filter=lfs diff=lfs merge=lfs -text
+DATA/DeepGuardDB_v1/GLIDE_dataset/real/* filter=lfs diff=lfs merge=lfs -text
+DATA/DeepGuardDB_v1/IMAGEN_dataset/fake/* filter=lfs diff=lfs merge=lfs -text
+DATA/DeepGuardDB_v1/IMAGEN_dataset/real/* filter=lfs diff=lfs merge=lfs -text
+DATA/DeepGuardDB_v1/SD_dataset/fake/* filter=lfs diff=lfs merge=lfs -text
+DATA/DeepGuardDB_v1/SD_dataset/real/* filter=lfs diff=lfs merge=lfs -text 
+DATA/DeepGuardDB_v1/**/* filter=lfs diff=lfs merge=lfs -text

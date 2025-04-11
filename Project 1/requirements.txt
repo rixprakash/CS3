@@ -1,0 +1,15 @@
+pandas
+numpy
+scikit-learn
+tensorflow
+torch
+transformers
+matplotlib
+seaborn
+joblib
+pytest
+scipy
+fastapi 
+uvicorn 
+flask   
+

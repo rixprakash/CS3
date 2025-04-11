@@ -1,0 +1,12 @@
+Hypothesis Testing Results:
+Best model using SPY data only: LR_SPY_Only
+  - RMSE: 0.008035
+  - Directional Accuracy: 0.4589
+
+Best model incorporating VIX data: LR_SPY_VIX
+  - RMSE: 0.008221
+  - Directional Accuracy: 0.4429
+
+Improvement by incorporating VIX data:
+  - RMSE reduction: -2.32%
+  - Directional Accuracy increase: -3.49%

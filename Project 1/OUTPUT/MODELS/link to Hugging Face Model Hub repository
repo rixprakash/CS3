@@ -1,0 +1,10 @@
+This link contain:
+
+│   ├── bert-genre-classification/
+│       ├── config.json
+│       ├── special_tokens_map.json
+│       ├── tokenizer_config.json
+│       ├── model.safetensors
+│       ├── vocab.txt
+
+https://huggingface.co/AZ0202/bert-genre-classification/tree/main
