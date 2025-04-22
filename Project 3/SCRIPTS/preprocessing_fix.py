@@ -61,45 +61,62 @@ def find_image_paths(data_dir, categories=None):
     print(f"Searching for images in: {data_dir}")
     print(f"Directory exists: {os.path.exists(data_dir)}")
     
-    # Look for DeepGuardDB_v1 directory structure
-    if os.path.exists(data_dir):
-        # List generator directories
-        generator_dirs = [
-            d for d in os.listdir(data_dir) 
-            if os.path.isdir(os.path.join(data_dir, d)) and d.endswith('_dataset')
-        ]
-        print(f"Found generator directories: {generator_dirs}")
-        
-        for generator in generator_dirs:
-            generator_path = os.path.join(data_dir, generator)
-            print(f"Checking generator directory: {generator_path}")
-            
-            for category in categories:
-                category_path = os.path.join(generator_path, category)
-                print(f"Checking category path: {category_path}")
-                print(f"Category path exists: {os.path.exists(category_path)}")
-                
-                if os.path.exists(category_path):
-                    # Find all image files
-                    for ext in ['jpg', 'jpeg', 'png']:
-                        pattern = os.path.join(category_path, f"*.{ext}")
-                        found_images = glob.glob(pattern)
-                        print(f"Found {len(found_images)} images with extension {ext} in {category_path}")
-                        image_paths[category].extend(found_images)
+    # Look for DeepGuardDB_v1 directory
+    deepguard_dir = data_dir
+    if os.path.basename(data_dir) != 'DeepGuardDB_v1' and os.path.exists(os.path.join(data_dir, 'DeepGuardDB_v1')):
+        deepguard_dir = os.path.join(data_dir, 'DeepGuardDB_v1')
+        print(f"Using DeepGuardDB_v1 directory: {deepguard_dir}")
     
-    # If no images found in DeepGuardDB structure, look for simpler structure
-    if all(len(paths) == 0 for paths in image_paths.values()):
-        print("No images found in DeepGuardDB structure, checking simpler structure...")
+    # List model directories (DALLE_dataset, GLIDE_dataset, etc.)
+    model_dirs = [
+        d for d in os.listdir(deepguard_dir) 
+        if os.path.isdir(os.path.join(deepguard_dir, d)) and d.endswith('_dataset')
+    ]
+    
+    print(f"Found model directories: {model_dirs}")
+    
+    # Traverse each model directory looking for real/fake subdirectories
+    for model_dir in model_dirs:
+        model_path = os.path.join(deepguard_dir, model_dir)
+        print(f"Checking model directory: {model_path}")
+        
         for category in categories:
+            category_path = os.path.join(model_path, category)
+            print(f"Checking category path: {category_path}")
+            print(f"Category path exists: {os.path.exists(category_path)}")
+            
+            if os.path.exists(category_path):
+                # Find all image files with various extensions
+                for ext in ['jpg', 'jpeg', 'png']:
+                    pattern = os.path.join(category_path, f"*.{ext}")
+                    found_images = glob.glob(pattern)
+                    print(f"Found {len(found_images)} images with extension {ext} in {category_path}")
+                    image_paths[category].extend(found_images)
+    
+    # If no images found, try a simpler directory structure
+    if all(len(paths) == 0 for paths in image_paths.values()):
+        print("No images found in the expected structure, checking simpler structure...")
+        for category in categories:
+            # Try "images/real" and "images/fake" structure
             category_path = os.path.join(data_dir, 'images', category)
             if os.path.exists(category_path):
-                # Find all image files
+                for ext in ['jpg', 'jpeg', 'png']:
+                    image_paths[category].extend(
+                        glob.glob(os.path.join(category_path, f"*.{ext}"))
+                    )
+            
+            # Try direct "real" and "fake" directories
+            category_path = os.path.join(data_dir, category)
+            if os.path.exists(category_path):
                 for ext in ['jpg', 'jpeg', 'png']:
                     image_paths[category].extend(
                         glob.glob(os.path.join(category_path, f"*.{ext}"))
                     )
     
     print(f"Total images found: {sum(len(paths) for paths in image_paths.values())}")
+    for category in categories:
+        print(f"Sample {category} image paths: {image_paths[category][:5]}")
+    
     return image_paths
 
 def load_images_from_paths(image_paths, target_size=(224, 224), max_images=None):
@@ -166,9 +183,6 @@ def preprocess_data(data_dir, json_path=None, test_size=0.2, val_size=0.2, targe
         # Find images in the directory structure
         print("Finding images in directory structure...")
         image_paths = find_image_paths(data_dir)
-        print("Sample real image paths:", image_paths['real'][:5])
-        print("Sample fake image paths:", image_paths['fake'][:5])
-
         
         # Load images from paths
         X, y = load_images_from_paths(image_paths, target_size)
@@ -248,21 +262,30 @@ def create_data_generators(X_train, X_val, X_test, y_train, y_val, y_test, batch
         width_shift_range=0.2,
         height_shift_range=0.2,
         horizontal_flip=True,
+        zoom_range=0.2,
+        shear_range=0.2,
         fill_mode='nearest'
     )
     
-    val_test_datagen = ImageDataGenerator()
+    val_datagen = ImageDataGenerator()
+    test_datagen = ImageDataGenerator()
     
     train_generator = train_datagen.flow(
-        X_train, y_train, batch_size=batch_size, shuffle=True
+        X_train, y_train,
+        batch_size=batch_size,
+        shuffle=True
     )
     
-    val_generator = val_test_datagen.flow(
-        X_val, y_val, batch_size=batch_size, shuffle=False
+    val_generator = val_datagen.flow(
+        X_val, y_val,
+        batch_size=batch_size,
+        shuffle=False
     )
     
-    test_generator = val_test_datagen.flow(
-        X_test, y_test, batch_size=batch_size, shuffle=False
+    test_generator = test_datagen.flow(
+        X_test, y_test,
+        batch_size=batch_size,
+        shuffle=False
     )
     
     return train_generator, val_generator, test_generator 

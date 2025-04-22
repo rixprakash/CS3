@@ -1,0 +1,53 @@
+#!/bin/bash
+#SBATCH --job-name=hybrid_model
+#SBATCH --output=hybrid_model_%j.log
+#SBATCH --error=hybrid_model_%j.err
+#SBATCH --time=02:00:00
+#SBATCH --mem=32G
+#SBATCH --cpus-per-task=8
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:1
+
+# Load required modules
+module purge
+module load cuda/12.4.1
+
+# Print the environment for debugging
+echo "PATH: $PATH"
+echo "HOME: $HOME"
+echo "Working directory: $(pwd)"
+
+# Use the correct path to Python
+PYTHON=$(which python)
+echo "Using Python at: $PYTHON"
+
+# Install required packages directly in user space
+$PYTHON -m pip install --user --upgrade pip
+$PYTHON -m pip install --user numpy pandas matplotlib seaborn scikit-learn scikit-image tensorflow torch torchvision tqdm
+echo "Installing OpenCV (cv2)..."
+$PYTHON -m pip install --user opencv-python
+
+# Verify the installation of key packages
+echo "Checking if cv2 is installed..."
+$PYTHON -c "import cv2; print('cv2 version:', cv2.__version__)" || echo "cv2 NOT found!"
+
+# Set up output directory
+OUTPUT_DIR="$HOME/Project3/model_results/hybrid_model"
+mkdir -p "$OUTPUT_DIR"
+echo "Output directory: $OUTPUT_DIR"
+
+# Check for GPU availability
+nvidia-smi
+
+# Run hybrid model training
+echo "Starting hybrid model training at $(date)"
+cd $HOME/Project3/SCRIPTS
+echo "Current directory: $(pwd)"
+echo "Files in current directory:"
+ls -la
+
+# Run Python script with debugging and capture error output
+echo "Running: $PYTHON main.py --model_type hybrid --output_dir $OUTPUT_DIR"
+$PYTHON main.py --model_type hybrid --output_dir "$OUTPUT_DIR" 2>&1 || echo "Error running main.py: $?"
+
+echo "Hybrid model training completed at $(date)"
